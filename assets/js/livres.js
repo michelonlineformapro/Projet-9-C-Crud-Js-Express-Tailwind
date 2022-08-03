@@ -3,6 +3,28 @@ L’évènement DOMContentLoaded est émis lorsque le document HTML initial a é
 sans attendre que les feuilles de style, images et sous-documents aient terminé de charger.
  */
 document.addEventListener('DOMContentLoaded', () => {
+    //Le formulaire ajouter
+    const addForm = document.getElementById("ajouterFormulaireLivre");
+
+    //Afficher - Cacher le formulaire d'ajout de livre
+    const showHideAddFormBtn = document.getElementById("afficherCacherAjouterFormulaire");
+    showHideAddFormBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        console.log("ok clic")
+        addForm.classList.toggle("ajouterFormulaireLivre-show")
+    });
+
+        //Le bouton pour valider le formulaire d'ajout de livre
+    const btnValidAddBook = document.getElementById("validerLivreBtn");
+
+    btnValidAddBook.addEventListener("click", (e) => {
+        e.preventDefault();
+        ajouterLivre();
+    })
+
+
+
+
     //Ici html et css deja charger avant javascript
     const livresDIV = document.getElementById('livresDIV');
 
@@ -12,13 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
         //Le parcours du fichier  produits.json avec fetch et des promesses
         //Api fetch a besoin d'une URL en paramètre (ici notre server.js)
         //On utilise API fetch + promesse = AJAX
-        fetch('http://localhost:3000/livres', {
-            method: 'GET',
-            headers: {
-                'Access-Control-Allow-Origin': '*',
-                'Content-Type': 'application/json',
-            }
-        })
+        fetch('http://localhost:3000/livres/')
             //1er promesse
             //On retourne la reponse a la requète sous forme d'un objet : //Ici le json livre est un objet
             .then(response => {
@@ -30,30 +46,28 @@ document.addEventListener('DOMContentLoaded', () => {
                 let carteLivres = Livres.map((alias) =>
                     //Le bloc tailwind carte
                     `
-           
-                    <div class="container flex justify-center w-full mt-10" id="carte-produit-${alias.id}">
-                      <div class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 col-span-1 flex flex-col bg-white border-2 p-4">
-                            <div class="mb-8 items-stretch ">   
+                    <div class="carte-livre" id="carte-produit-${alias.id}">
+                      <div class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 bg-white border-2">
+                            <div class="mb-8">   
                                 <div class="grid place-items-center p-3">                                            
-                                    <h1 class="font-medium leading-tight text-5xl mt-0 mb-2 text-red-800">${alias.nomLivre}</h1>   
+                                    <h1 class="font-medium leading-tight text-white text-5xl mt-0 mb-2 text-red-800 bg-red-800 p-6">${alias.nomLivre}</h1>   
                                 </div>                                                                            
-                                <div class="flex items-center">
-                                  <img class="rounded-full mr-4" src="${alias.imageLivre}" alt="${alias.nomLivre}" title="${alias.nomLivre}"/>                                                               
+                                <div class="grid place-items-center mt-10">
+                                  <img class="rounded-full mr-4" src="${alias.imageLivre}" alt="${alias.nomLivre}" title="${alias.nomLivre}" width="300" height="200"/>                                                               
                                 </div>
                                
                                 <div class="grid place-items-center mt-10">
                                       <button  id="details-livre-${alias.id}" class="bg-red-800 hover:bg-green-700 text-white font-bold py-6 px-4 rounded">Détails du livre</button> 
                                 </div>
                                 
-                                   <div class="grid place-items-center mt-10">
+                                <div class="grid place-items-center mt-10">
                                       <button  id="supprimer-livre-${alias.id}" class="bg-green-800 hover:bg-blue-700 text-white font-bold py-6 px-4 rounded">Supprimer livre</button> 
                                 </div>
                                  
                             </div>
                        </div>
                     </div>     
-                   
-                                                                              
+                                                                            
                     `
                 )
                 //On ajoute le bloc de carte au parent HTML
@@ -99,11 +113,18 @@ document.addEventListener('DOMContentLoaded', () => {
         //Affiche les details du livres
         detailsEnfant.innerHTML =
             `
-             <h2>${livre.nomLivre}</h2>
-             <img src="${livre.imageLivre}" alt="${livre.nomLivre}" title="${livre.nomLivre}">
-             <p>Description : ${alias.descriptionLivre}</p>
-             <p>PRIX : ${livre.prixLivre}</p>
+            <div class="container flex justify-center w-50 mt-10" id="carte-produit-${livre.id}">
+                 <div class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 col-span-1 flex flex-col bg-white border-2 p-4">
+             <h2 class="font-medium leading-tight text-5xl mt-0 mb-2 text-red-800">${livre.nomLivre}</h2>
+             
+             <div class="grid place-items-center mt-10">
+                    <img class="rounded-full mr-4" src="${livre.imageLivre}" alt="${livre.nomLivre}" title="${livre.nomLivre}"/>                                                               
+             </div>
+             <div class="font-medium text-2xl text-green-200 mt-6 p-4">Description : ${livre.descriptionLivre}</div>
+             <div class="font-medium text-2xl text-red-500 mt-6 p-4">PRIX : ${livre.prixLivre} €</div>
              <button id="btnBack" class="bg-red-800 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-6">retour</button>
+             </div>
+             </div>
                    
             `
         //Ajoute le bloc html au aprent
@@ -124,17 +145,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     }
 
+    //Supprimer un et un seul produit
     function supprimerProduit(livre){
         //alert('test de suppr livre')
+        //La carte entiere creer dans afficherLivre() recup avec son id
         const carteProduit = document.querySelector(`#carte-produit-${livre.id}`)
-        //Feneètre de confirmation de supression
+        //Fenètre de confirmation de supression
         if (window.confirm("Confirmer la supression ?")) {
-            //Appel de URL du back tester avec POSTMAN qui splice un obket
+            //Appel de URL du back tester avec POSTMAN qui splice un objet
             fetch(`http://localhost:3000/supprimer-livre/${livre.id}`,{
                 //La methode de la requète http = delete
                 method: "DELETE"
             })
-                //On retourne une bobjet au format json (l'objet a supprimer)
+                //On retourne un objet au format json (l'objet a supprimer)
                 .then(response => console.log(response.json()))
                 //On retire ne noeud carteLivre du DOM avec remove()
                 .then(() => {
@@ -146,9 +169,66 @@ document.addEventListener('DOMContentLoaded', () => {
 
     }
 
+
+    function ajouterLivre(){
+        //alert("appel de la fonction ajouter")
+        //recuperer les valeur de chaque input du formulaire de produits.html grace a id et .value
+        const nomLivreInput = document.getElementById("nomLivre").value;
+        const descriptionLivreInput = document.getElementById("descriptionLivre").value;
+        const prixLivreInput = document.getElementById("prixLivre").value;
+        const imageLivreInput = document.getElementById("imageLivre").value;
+        //Debug dans le f12 console du navigateur
+        //console.log(nomLivreInput)
+        //console.log(descriptionLivreInput)
+        //console.log(prixLivreInput)
+        //console.log(imageLivreInput)
+
+        //Cree nouvel objet livre : chaque cle = input.valeur du formulaire
+        let nouveauLivre = {
+            nomLivre: nomLivreInput,
+            descriptionLivre: descriptionLivreInput,
+            prixLivre: prixLivreInput,
+            imageLivre: imageLivreInput
+        }
+        //Appel de url du back (server.js) testée avec POSTMAN
+        fetch('http://localhost:3000/ajouter-livres',{
+            //la methode POST
+            method: 'POST',
+            //les options de entete de la requète http
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Content-Type': 'application/json'
+            },
+            /*
+         La méthode JSON.stringify() convertit une valeur JavaScript en chaîne JSON.
+         Optionnellement, elle peut remplacer des valeurs ou spécifier les propriétés
+          à inclure si un tableau de propriétés a été fourni.
+         */
+            body: JSON.stringify(nouveauLivre)
+        })
+            //retourne une reponse au format json
+            .then(response => response.json())
+            //Appel de la fonction afficherLivre pour les mettres a jour
+            .then(afficherLivres)
+            //Message dans le f12 du navigateur
+            .then(() => console.log("La livre a bien a été ajouté !"))
+            //On cache le formulaire d'ajout
+            .then(() => {
+                const displayAddForm = document.getElementById("ajouterFormulaireLivre");
+                displayAddForm.style.display = 'none'
+            })
+            //On efresh la table
+            .then(() => {
+                window.location.reload()
+            })
+            //Sinon on affiche une erreur
+            .catch(erreur => console.log("Erreur " + erreur))
+    }
+
+    //la fonction pour afficher les livres
     afficherLivres()
 
-})
+});
 
 
 

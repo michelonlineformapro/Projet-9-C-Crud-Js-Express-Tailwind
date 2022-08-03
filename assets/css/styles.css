@@ -1,4 +1,19 @@
 html, body{
-    background-color: darkslategray;
-    color: orangered;
+    background-color: #F2F2F2;
+    color: #2E4D59;
+    font-family: 'Ubuntu', sans-serif;
+    font-size: 10px;
+}
+
+.ajouterFormulaireLivre{
+    display: none;
+}
+
+.ajouterFormulaireLivre-show{
+    display: block;
+}
+.carte-livre{
+    height: 100%!important;
+    display: flex;
+    justify-content: center;
 }
