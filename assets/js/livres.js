@@ -245,6 +245,114 @@ document.addEventListener('DOMContentLoaded', () => {
         let conteneurPrincipale = document.getElementById("conteneur-principale");
         //On le cache avec du css
         conteneurPrincipale.style.display = "none";
+        //Recuperer la <div> formulaire edition dans html
+        const editerFormulaire = document.getElementById("edit-form");
+        //Creer un formulaire
+        const formulaireEdition = document.createElement("form");
+        //Ajouter l'attibut methode POST
+        formulaireEdition.setAttribute('method','POST');
+        //Le formulaire d'edition
+        formulaireEdition.innerHTML = `
+             <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="nomLivre">
+                    Nom du livre
+                </label>
+                <input  class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="nomLivreEdit" type="text" value="${livre.nomLivre}">
+            </div>
+            <div class="mb-6">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="descriptionLivre">
+                    Description du livre
+                </label>
+                <input class="shadow appearance-none border border-red-500 rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline" type="text" id="descriptionLivreEdit" value="${livre.descriptionLivre}">
+
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="nomLivre">
+                    Prix du livre
+                </label>
+                <input  class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="prixLivreEdit" type="number" step="0.01" value="${livre.prixLivre}">
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="nomLivre">
+                    Image du livre
+                </label>
+                <input  class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="imageLivreEdit" type="text" value="${livre.imageLivre}">
+            </div>
+
+            <div class="grid place-items-center mt-10">
+                <button  id="validerEditionLivreBtn" class="bg-orange-800 hover:bg-blue-700 text-white font-bold py-6 px-4 rounded">Mettre a jour le livre</button>
+            </div>
+            
+            <div class="grid place-items-center mt-10">
+                <button type="reset" class="bg-red-800 hover:bg-slate-700 text-white font-bold py-6 px-4 rounded">Vider les champs</button>
+            </div>
+            
+            <div class="grid place-items-center mt-10">
+                <button type="reset" onclick="window.location.reload()" class="bg-lime-800 hover:bg-blue-700 text-white font-bold py-6 px-4 rounded">Annuler</button>
+            </div>
+        `
+        //On injecte le fprmulaire dans le conteneur parent
+        editerFormulaire.appendChild(formulaireEdition);
+        //Le bouton de validation du formulaire
+        const valideEditionBtn = document.getElementById("validerEditionLivreBtn");
+        //le clic
+        valideEditionBtn.addEventListener("click", (e) =>{
+            e.preventDefault();
+            //Les valeurs de chaque champs
+            const nomLivreInputEdit = document.getElementById("nomLivreEdit").value;
+            const descriptionLivreInputEdit = document.getElementById("descriptionLivreEdit").value;
+            const prixLivreInputEdit = document.getElementById("prixLivreEdit").value;
+            const imageLivreInputEdit = document.getElementById("imageLivreEdit").value;
+
+            /*
+            Le debug
+            console.log(nomLivreInputEdit)
+            console.log(descriptionLivreInputEdit)
+            console.log(prixLivreInputEdit)
+            console.log(imageLivreInputEdit)
+            */
+
+            //On creer un nouvel objet qui remplace l'ancien
+            editerLivre = {
+                nomLivre: nomLivreInputEdit,
+                descriptionLivre: descriptionLivreInputEdit,
+                prixLivre: prixLivreInputEdit,
+                imageLivre: imageLivreInputEdit,
+            }
+            //Url du back tester avec postman
+            fetch(`http://localhost:3000/livres/${livre.id}`,{
+                //La methode put remplace tous
+                method: 'PUT',
+                //Option entete requète http
+                headers:{
+                    'Access-Control-Allow-Origin': '*',
+                    'Content-Type': 'application/json'
+                },
+                //le corps de la requete recupe les valeurs du formulaire et les envoies au back avec fetch()
+                body: JSON.stringify(editerLivre)
+            })
+
+                .then(response => response.json("Votre produit a bien été modifié !"))
+                .then(() => {
+                    //On cache le formulaire
+                    editerFormulaire.className = "animate__animated animate__slideOutLeft"
+                })
+                //On refresh la page
+                .then(() => {
+                    setTimeout(() => {
+                        window.location.reload()
+                    }, 500)
+                })
+                //Sinon une erreur
+                .catch(erreur => console.log("Erreur " + erreur))
+
+        })
+
+
+
+
+
     }
 
 
