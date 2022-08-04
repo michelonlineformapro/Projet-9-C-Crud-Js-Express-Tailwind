@@ -114,6 +114,36 @@ app.post('/ajouter-livres', (request, response) => {
     //console.log(ajouterLivre);
 })
 
+//Mettre a jour un produit
+//l'instance d'expressjs appel la methode put + une fonction avec en paramètre request + response
+app.put('/livres/:id', (request, response) => {
+    //L'in passer dans url
+    let idBind = Number(request.params.id);
+    //on lie id de url avec l'id d'un objet du fichier json
+    const index = livres.findIndex(produit => produit.id === idBind);
+    //Si id (index du tableau) , 'existe pas
+    if(index === -1){
+        return response.status(404).send("Aucun livre n'a cet id !")
+    }
+
+    //Creer un nouveau livre (objet) qui va remplecer l'ancien
+    const mettreJourLivre = {
+        //recupereration de l'id d'un objet existant
+        id: livres[index].id,
+        //recup des elements du fichier json
+        nomLivre: request.body.nomLivre,
+        descriptionLivre: request.body.descriptionLivre,
+        prixLivre: request.body.prixLivre,
+        imageLivre: request.body.imageLivre
+    }
+    //L'objet concerneé est egale au nouvel objet
+    livres[index] = mettreJourLivre;
+    //message de debug reussite
+    response.status(200).json("Le produit a été mis a jour !");
+    //Sauvegarder le changement d'etat du fichier json
+    saveLivresChange(livres);
+})
+
 //Sauvegarde des changement d'etat du fichier livres.json
 const saveLivresChange = (livres) => {
     //La méthode JSON.stringify() convertit une valeur JavaScript en chaîne JSON. Optionnellement,

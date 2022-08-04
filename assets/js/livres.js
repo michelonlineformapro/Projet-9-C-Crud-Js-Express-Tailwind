@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         //Le bouton pour valider le formulaire d'ajout de livre
     const btnValidAddBook = document.getElementById("validerLivreBtn");
-
+    //Un evenement clic + appel d'une fonction
     btnValidAddBook.addEventListener("click", (e) => {
         e.preventDefault();
         ajouterLivre();
@@ -63,6 +63,10 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <div class="grid place-items-center mt-10">
                                       <button  id="supprimer-livre-${alias.id}" class="bg-green-800 hover:bg-blue-700 text-white font-bold py-6 px-4 rounded">Supprimer livre</button> 
                                 </div>
+                                
+                                <div class="grid place-items-center mt-10">
+                                      <button  id="editer-livre-${alias.id}" class="bg-blue-800 hover:bg-red-700 text-white font-bold py-6 px-4 rounded">Editer livre</button> 
+                                </div>
                                  
                             </div>
                        </div>
@@ -90,6 +94,15 @@ document.addEventListener('DOMContentLoaded', () => {
                         //Supprime le comportement par defaut (evite le rechargement de la page)
                         event.preventDefault();
                         supprimerProduit(livre)
+                    });
+
+
+                    //Recuperer les boutton supprimer
+                    const btnEditer = document.querySelector(`#editer-livre-${livre.id}`);
+                    btnEditer.addEventListener("click", (event) => {
+                        //Supprime le comportement par defaut (evite le rechargement de la page)
+                        event.preventDefault();
+                        editerProduit(livre)
                     });
                 });
 
@@ -220,10 +233,20 @@ document.addEventListener('DOMContentLoaded', () => {
             //On efresh la table
             .then(() => {
                 window.location.reload()
+                window.scrollTo(0, document.body.scrollHeight);
             })
             //Sinon on affiche une erreur
             .catch(erreur => console.log("Erreur " + erreur))
     }
+
+    function editerProduit(livre){
+        //alert('test de la fonction editer')
+        //on recuperre le conteneur principale
+        let conteneurPrincipale = document.getElementById("conteneur-principale");
+        //On le cache avec du css
+        conteneurPrincipale.style.display = "none";
+    }
+
 
     //la fonction pour afficher les livres
     afficherLivres()

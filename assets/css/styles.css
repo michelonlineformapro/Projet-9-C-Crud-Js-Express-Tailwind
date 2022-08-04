@@ -3,6 +3,7 @@ html, body{
     color: #2E4D59;
     font-family: 'Ubuntu', sans-serif;
     font-size: 10px;
+    scroll-behavior: smooth;
 }
 
 .ajouterFormulaireLivre{
